@@ -30,8 +30,8 @@ export function SignalCard() {
         setSignal(data);
         setError(null);
       } catch (err) {
-        setError(err.message);
-        setSignal(null);
+        console.error("Sinyal yüklenirken hata:", err);
+        setError("Sinyal yüklenemedi");
       } finally {
         setLoading(false);
       }
@@ -57,7 +57,7 @@ export function SignalCard() {
     );
   }
 
-  if (error) {
+  if (error && !signal) {
     return (
       <Card>
         <CardHeader>
