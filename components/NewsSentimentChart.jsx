@@ -13,6 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { fetchNews } from "@/lib/api";
 
 // Chart.js bileşenlerini kaydet
 ChartJS.register(
@@ -29,14 +30,10 @@ export default function NewsSentimentChart() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchNewsSentiment() {
+    async function loadNewsSentiment() {
       try {
         setIsLoading(true);
-        const res = await fetch("/api/news");
-        if (!res.ok) {
-          throw new Error("Veri çekilemedi");
-        }
-        const data = await res.json();
+        const data = await fetchNews();
         setSentiment(data);
       } catch (error) {
         console.error("Haber duyarlılığı hatası:", error);
@@ -46,8 +43,8 @@ export default function NewsSentimentChart() {
       }
     }
 
-    fetchNewsSentiment();
-    const interval = setInterval(fetchNewsSentiment, 5 * 60 * 1000); // 5 dakikada bir güncelle
+    loadNewsSentiment();
+    const interval = setInterval(loadNewsSentiment, 5 * 60 * 1000); // 5 dakikada bir güncelle
     return () => clearInterval(interval);
   }, []);
 

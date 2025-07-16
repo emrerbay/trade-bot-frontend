@@ -31,15 +31,46 @@ const analyzeSentiment = headline => {
   return "neutral";
 };
 
-export default async function NewsPage() {
-  const newsData = await fetchNews();
+export default function NewsPage() {
+  const [newsData, setNewsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Veri gelmezse veya 'articles' dizisi boşsa hata mesajı göster
-  if (!newsData || !newsData.articles || newsData.articles.length === 0) {
+  useEffect(() => {
+    async function loadNews() {
+      try {
+        const data = await fetchNews();
+        setNewsData(data);
+      } catch (err) {
+        console.error("Haber yüklenirken hata:", err);
+        setError("Haberler yüklenemedi.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadNews();
+  }, []);
+
+  if (loading) {
     return (
       <div className="p-4 md:p-6">
         <h1 className="text-3xl font-bold mb-4">Haberler</h1>
-        <p>Haberler yüklenemedi veya mevcut değil.</p>
+        <p>Haberler yükleniyor...</p>
+      </div>
+    );
+  }
+
+  if (
+    error ||
+    !newsData ||
+    !newsData.articles ||
+    newsData.articles.length === 0
+  ) {
+    return (
+      <div className="p-4 md:p-6">
+        <h1 className="text-3xl font-bold mb-4">Haberler</h1>
+        <p>{error || "Haberler yüklenemedi veya mevcut değil."}</p>
       </div>
     );
   }

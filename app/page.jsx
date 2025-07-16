@@ -7,6 +7,7 @@ import { SignalCard } from "@/components/SignalCard";
 import NewsSentimentChart from "@/components/NewsSentimentChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Gauge, Newspaper } from "lucide-react";
+import { fetchSignal, fetchNews } from "@/lib/api";
 
 // --- Dinamik Veri Kartları ---
 
@@ -110,17 +111,13 @@ export default function Home() {
       try {
         if (lastUpdated === null) setIsLoading(true);
 
-        const [signalRes, newsRes] = await Promise.all([
-          fetch("/api/signal"),
-          fetch("/api/news"),
+        const [signalData, newsData] = await Promise.all([
+          fetchSignal(),
+          fetchNews(),
         ]);
 
-        if (!signalRes.ok)
-          throw new Error(`Sinyal API Hatası: ${signalRes.status}`);
-        if (!newsRes.ok) throw new Error(`Haber API Hatası: ${newsRes.status}`);
-
-        setSignalData(await signalRes.json());
-        setNewsData(await newsRes.json());
+        setSignalData(signalData);
+        setNewsData(newsData);
         setLastUpdated(new Date());
       } catch (error) {
         console.error("Dashboard verisi çekilirken hata:", error);

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchSignal } from "@/lib/api";
 
 function getSignalColor(decision) {
   switch (decision) {
@@ -22,14 +23,10 @@ export function SignalCard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchSignal() {
+    async function loadSignal() {
       try {
         setLoading(true);
-        const res = await fetch("/api/signal");
-        if (!res.ok) {
-          throw new Error(`API hatası: ${res.status}`);
-        }
-        const data = await res.json();
+        const data = await fetchSignal();
         setSignal(data);
         setError(null);
       } catch (err) {
@@ -40,8 +37,8 @@ export function SignalCard() {
       }
     }
 
-    fetchSignal();
-    const interval = setInterval(fetchSignal, 60000); // Her 60 saniyede bir güncelle
+    loadSignal();
+    const interval = setInterval(loadSignal, 60000); // Her 60 saniyede bir güncelle
 
     return () => clearInterval(interval);
   }, []);
